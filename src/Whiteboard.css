@@ -1,0 +1,168 @@
+.whiteboard {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+}
+
+.toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.toolbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.add-note-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.add-note-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.add-note-btn:active {
+  transform: translateY(0);
+}
+
+.note {
+  position: absolute;
+  width: 250px;
+  min-height: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.3s ease;
+  z-index: 1;
+}
+
+.note:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  z-index: 10;
+}
+
+.note-header {
+  padding: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+  cursor: move;
+  user-select: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.delete-btn {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 1.5rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.delete-btn:hover {
+  background: rgba(0, 0, 0, 0.4);
+  color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.note-textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: none;
+  outline: none;
+  color: rgba(0, 0, 0, 0.87);
+  line-height: 1.5;
+  min-height: 160px;
+}
+
+.note-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.empty-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .toolbar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .toolbar h1 {
+    font-size: 1.25rem;
+  }
+
+  .note {
+    width: 200px;
+    min-height: 180px;
+  }
+
+  .add-note-btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .whiteboard {
+    background: linear-gradient(135deg, #a8c0ff 0%, #c8b6ff 100%);
+  }
+
+  .toolbar {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .toolbar h1 {
+    color: #333;
+  }
+
+  .empty-state {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
