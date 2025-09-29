@@ -1,11 +1,11 @@
 Please implement the following feature request:
 
-**Feature Request:** Make the user be able to move in the board by drag and drop
+**Feature Request:** Make the user be able to zoom in and out using the scroll
 
 **Project Context:**
 - Repository: v-vibers/note-taking-whiteboard
-- Branch: feat/make-the-user-be-able-to-move-in-the-boa
-- Base Branch: feat/make-the-user-able-to-zoom-in-and-out-th
+- Branch: feat/make-the-user-be-able-to-zoom-in-and-out
+- Base Branch: feat/make-the-user-be-able-to-move-in-the-boa
 - Requested by: AlexLunaArceDev
 
 **CRITICAL - Read Project Instructions First:**
