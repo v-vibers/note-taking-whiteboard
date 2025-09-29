@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import './Whiteboard.css';
 
 interface Note {
@@ -10,11 +10,17 @@ interface Note {
 }
 
 const COLORS = ['#ffd54f', '#81c784', '#64b5f6', '#e57373', '#ba68c8', '#ffb74d'];
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 3;
+const ZOOM_STEP = 0.1;
 
 function Whiteboard() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [draggedNote, setDraggedNote] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const addNote = () => {
     const newNote: Note = {
@@ -68,20 +74,99 @@ function Whiteboard() {
     setDraggedNote(null);
   };
 
+  const handleZoom = (delta: number) => {
+    setZoom((prevZoom) => {
+      const newZoom = prevZoom + delta;
+      return Math.min(Math.max(newZoom, MIN_ZOOM), MAX_ZOOM);
+    });
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+      handleZoom(delta);
+    }
+  };
+
+  const resetZoom = () => {
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        handleZoom(ZOOM_STEP);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === '-') {
+        e.preventDefault();
+        handleZoom(-ZOOM_STEP);
+      } else if ((e.ctrlKey || e.metaKey) && e.key === '0') {
+        e.preventDefault();
+        resetZoom();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <div
       className="whiteboard"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onWheel={handleWheel}
+      ref={boardRef}
     >
       <div className="toolbar">
         <h1>Whiteboard Notes</h1>
-        <button onClick={addNote} className="add-note-btn">
-          + Add Note
-        </button>
+        <div className="toolbar-controls">
+          <div className="zoom-controls">
+            <button
+              onClick={() => handleZoom(-ZOOM_STEP)}
+              className="zoom-btn"
+              disabled={zoom <= MIN_ZOOM}
+              aria-label="Zoom out"
+              title="Zoom out (Ctrl + -)"
+            >
+              −
+            </button>
+            <span className="zoom-level" title="Current zoom level">
+              {Math.round(zoom * 100)}%
+            </span>
+            <button
+              onClick={() => handleZoom(ZOOM_STEP)}
+              className="zoom-btn"
+              disabled={zoom >= MAX_ZOOM}
+              aria-label="Zoom in"
+              title="Zoom in (Ctrl + +)"
+            >
+              +
+            </button>
+            <button
+              onClick={resetZoom}
+              className="zoom-reset-btn"
+              aria-label="Reset zoom"
+              title="Reset zoom (Ctrl + 0)"
+            >
+              Reset
+            </button>
+          </div>
+          <button onClick={addNote} className="add-note-btn">
+            + Add Note
+          </button>
+        </div>
       </div>
 
-      {notes.map((note) => (
+      <div
+        className="board-content"
+        style={{
+          transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+        }}
+      >
+        {notes.map((note) => (
         <div
           key={note.id}
           className="note"
@@ -112,11 +197,12 @@ function Whiteboard() {
         </div>
       ))}
 
-      {notes.length === 0 && (
-        <div className="empty-state">
-          <p>No notes yet. Click "Add Note" to get started!</p>
-        </div>
-      )}
+        {notes.length === 0 && (
+          <div className="empty-state">
+            <p>No notes yet. Click "Add Note" to get started!</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
