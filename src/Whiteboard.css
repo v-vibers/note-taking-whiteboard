@@ -5,6 +5,11 @@
   position: relative;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   background-attachment: fixed;
+  cursor: grab;
+}
+
+.whiteboard.panning {
+  cursor: grabbing;
 }
 
 .toolbar {

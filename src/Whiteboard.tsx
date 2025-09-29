@@ -20,6 +20,8 @@ function Whiteboard() {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const boardRef = useRef<HTMLDivElement>(null);
 
   const addNote = () => {
@@ -49,29 +51,45 @@ function Whiteboard() {
 
     setDraggedNote(noteId);
     setDragOffset({
-      x: e.clientX - note.x,
-      y: e.clientY - note.y,
+      x: (e.clientX - pan.x * zoom) / zoom - note.x,
+      y: (e.clientY - pan.y * zoom) / zoom - note.y,
     });
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!draggedNote) return;
-
-    setNotes(
-      notes.map((note) =>
-        note.id === draggedNote
-          ? {
-              ...note,
-              x: e.clientX - dragOffset.x,
-              y: e.clientY - dragOffset.y,
-            }
-          : note
-      )
-    );
+    if (draggedNote) {
+      setNotes(
+        notes.map((note) =>
+          note.id === draggedNote
+            ? {
+                ...note,
+                x: (e.clientX - pan.x * zoom) / zoom - dragOffset.x,
+                y: (e.clientY - pan.y * zoom) / zoom - dragOffset.y,
+              }
+            : note
+        )
+      );
+    } else if (isPanning) {
+      const deltaX = e.clientX - panStart.x;
+      const deltaY = e.clientY - panStart.y;
+      setPan({
+        x: pan.x + deltaX / zoom,
+        y: pan.y + deltaY / zoom,
+      });
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleMouseUp = () => {
     setDraggedNote(null);
+    setIsPanning(false);
+  };
+
+  const handleBoardMouseDown = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('board-content')) {
+      setIsPanning(true);
+      setPanStart({ x: e.clientX, y: e.clientY });
+    }
   };
 
   const handleZoom = (delta: number) => {
@@ -114,9 +132,10 @@ function Whiteboard() {
 
   return (
     <div
-      className="whiteboard"
+      className={`whiteboard ${isPanning ? 'panning' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onMouseDown={handleBoardMouseDown}
       onWheel={handleWheel}
       ref={boardRef}
     >
